@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 public class SysInfoServiceTest {
 
     String ip = "192.168.199.212";
-//String ip = "127.0.0.1";
+    //String ip = "127.0.0.1";
 
     @Test
     public void testGetCPULoad_1() throws IOException {
@@ -68,5 +68,10 @@ public class SysInfoServiceTest {
     @Test
     public void testGetDiskTotal() throws  IOException {
         assertNotNull(SysInfoService.getDiskTotal(ip));
+    }
+
+    @Test
+    public void testGetNetSpeed() throws  IOException {
+        assertNotNull(SysInfoService.getNetList(ip));
     }
 }

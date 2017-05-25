@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.snmp4j.smi.OID;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -13,28 +14,72 @@ import java.util.HashMap;
 public class SysInfoService {
     private static Logger logger = LoggerFactory.getLogger(SysInfoService.class);
 
-    private static final OID sys_name = new OID("1.3.6.1.2.1.1");
-    private static final OID sys_desc = new OID("1.3.6.1.2.1.25.3.2.1.3");
-    private static final OID sys_tree = new OID("1.3.6.1.2.1.25.3.2.1");
-    private static final OID hr_type_processor = new OID("1.3.6.1.2.1.25.3.1.3");
-
-    private static final OID processor_table = new OID("1.3.6.1.2.1.25.3.3");
-    private static final OID cpu_load = new OID("1.3.6.1.2.1.25.3.3.1.2");
-    private static final OID cpu_load_linux = new OID("1.3.6.1.2.1.25.3.3.1.2.196608");
-    private static final OID one_min_load = new OID("1.3.6.1.4.1.2021.10.1.3.1");
-    private static final OID five_min_load = new OID("1.3.6.1.4.1.2021.10.1.3.2");
-    private static final OID fifteen_min_load = new OID("1.3.6.1.4.1.2021.10.1.3.3");
-    private static final OID cpu_idle_time = new OID("1.3.6.1.4.1.2021.11.11.0");
-
-    private static final OID total_ram_free = new OID("1.3.6.1.4.1.2021.4.11.0");
-
-    private static final OID available_space = new OID("1.3.6.1.4.1.2021.9.1.7.1");
-    private static final OID used_space = new OID("1.3.6.1.4.1.2021.9.1.8.1");
-    private static final OID disk_percent = new OID("1.3.6.1.4.1.2021.9.1.9.1");
-    private static final OID disk_total = new OID("1.3.6.1.4.1.2021.9.1.6.1");
-
     private static SNMPNodeService service;
     private static String result = null;
+
+    public static class NetworkInterface {
+        private String id;
+        private String name;
+        private String mac;
+        private String ip;
+        private String inbound_speed;
+        private String outbound_speed;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getMac() {
+            return mac;
+        }
+
+        public void setMac(String mac) {
+            this.mac = mac;
+        }
+
+        public String getIp() {
+            return ip;
+        }
+
+        public void setIp(String ip) {
+            this.ip = ip;
+        }
+
+        public String getInbound_speed() {
+            return inbound_speed;
+        }
+
+        public void setInbound_speed(String inbound_speed) {
+            this.inbound_speed = inbound_speed;
+        }
+
+        public String getOutbound_speed() {
+            return outbound_speed;
+        }
+
+        public void setOutbound_speed(String outbound_speed) {
+            this.outbound_speed = outbound_speed;
+        }
+
+        public String toString() {
+            return this.id + ": " + this.name +
+                   ", IN: " + this.inbound_speed +
+                   ", OUT: " + this.outbound_speed +
+                   ", IP: " + this.ip;
+        }
+    }
 
     private String get(String address, OID oid) {
         try {
@@ -49,61 +94,69 @@ public class SysInfoService {
     }
 
     public static String getCPULoad_1(String address) {
-        return new SysInfoService().get(address, one_min_load);
+        return new SysInfoService().get(address, Constants.one_min_load);
     }
 
     public static String getCPULoad_5(String address) {
-        return new SysInfoService().get(address, five_min_load);
+        return new SysInfoService().get(address, Constants.five_min_load);
     }
 
     public static String getCPULoad_15(String address) {
-        return new SysInfoService().get(address, fifteen_min_load);
+        return new SysInfoService().get(address, Constants.fifteen_min_load);
 
     }
 
     public static String getMemFree(String address) {
-        return new SysInfoService().get(address, total_ram_free);
+        return new SysInfoService().get(address, Constants.total_ram_free);
     }
 
     public static String getDiskFree(String address) {
-        return formatSize(new SysInfoService().get(address, available_space));
+        return formatSize(new SysInfoService().get(address, Constants.available_space));
     }
 
     public static String getDiskUsed(String address) {
-        return formatSize(new SysInfoService().get(address, used_space));
+        return formatSize(new SysInfoService().get(address, Constants.used_space));
     }
 
     public static String getDiskUsedPercent(String address) {
-        return new SysInfoService().get(address, disk_percent);
+        return new SysInfoService().get(address, Constants.disk_percent);
     }
 
 
     public static HashMap<String, String> getSysDesc(String address) {
-        return SysInfoService.walk(address, sys_tree);
+        return walk(address, Constants.sys_tree);
+    }
+
+    public static HashMap<String, String> getNetDesc(String address) {
+        return walk(address, Constants.net_tree);
+    }
+
+    public static HashMap<String, String> getIpTree(String address) {
+        return walk(address, Constants.ip_addr_entry);
     }
 
     public static String getCPUName(String address) {
         HashMap<String, String> values = getSysDesc(address);
 
-        if(values == null || values.size() == 0) {
+        if (values == null || values.size() == 0) {
             return null;
         }
         for(String key : values.keySet()) {
-            if (values.get(key).equals(hr_type_processor.toString())) {
+            if (values.get(key).equals(Constants.hr_type_processor.toString())) {
                 String cpu_id = key.substring(key.lastIndexOf('.')+1);
-                return values.get(sys_desc.toString() + "." + cpu_id);
+                return values.get(Constants.sys_desc.toString() + "." + cpu_id);
             }
         }
         return null;
     }
 
     public static Integer getCPUCoreNumber(String address) {
-        return SysInfoService.walk(address, cpu_load).size();
+        return walk(address, Constants.cpu_load).size();
     }
 
     public static Integer getCPUPercent(String address) {
-        String idle = new SysInfoService().get(address, cpu_idle_time);
-        if(idle == null || idle.equals("noSuchObject")) {
+        String idle = new SysInfoService().get(address, Constants.cpu_idle_time);
+        if (idle == null || idle.equals("noSuchObject")) {
             return null;
         } else {
             return 100 - Integer.valueOf(idle);
@@ -111,7 +164,41 @@ public class SysInfoService {
     }
 
     public static String getDiskTotal(String address) {
-        return formatSize(new SysInfoService().get(address, disk_total));
+        return formatSize(new SysInfoService().get(address, Constants.disk_total));
+    }
+
+    public static ArrayList<NetworkInterface> getNetList(String address) {
+        HashMap<String, String> values = getNetDesc(address);
+        HashMap<String, String> ip_values = getIpTree(address);
+        ArrayList<NetworkInterface> networkInterfaces = new ArrayList<NetworkInterface>();
+
+        if (values == null || values.size() == 0) {
+            return null;
+        }
+
+        for(String key : values.keySet()) {
+            if (key.startsWith(Constants.if_descr.toString() + ".")) {
+                NetworkInterface net = new NetworkInterface();
+
+                net.setId(key.substring(key.lastIndexOf('.')+1));
+                net.setName(values.get(key));
+                net.setInbound_speed(values.get(Constants.if_in_octets + "." + net.getId()));
+                net.setOutbound_speed(values.get(Constants.if_out_octets + "." + net.getId()));
+                networkInterfaces.add(net);
+            }
+        }
+
+        for(String key : ip_values.keySet()) {
+            if (key.startsWith(Constants.ip_addr_index.toString())) {
+                for(NetworkInterface net : networkInterfaces) {
+                    if (ip_values.get(key).equals(net.getId())) {
+                        net.setIp(key.replace(Constants.ip_addr_index.toString() + ".", ""));
+                    }
+                }
+            }
+        }
+
+        return networkInterfaces;
     }
 
     public static HashMap<String, String> walk(String address, OID startOid) {
@@ -125,19 +212,19 @@ public class SysInfoService {
     }
 
     private static String formatSize(String size) {
-        if(size == null || size.equals("noSuchInstance")) {
+        if (size == null || size.equals("noSuchInstance")) {
             return null;
         }
 
         Integer num = Integer.valueOf(size);
 
-        if(num > 1073741823) {
+        if (num > 1073741823) {
             return String.format("%.2f TB", num / 1073741824.0);
         }
-        if(num > 1048575) {
+        if (num > 1048575) {
             return String.format("%.2f GB", num / 1048576.0);
         }
-        if(num > 1023) {
+        if (num > 1023) {
             return String.format("%.2f MB", num / 1024.0);
         }
         return size + " KB";
