@@ -31,6 +31,7 @@ public class SysInfoService {
     private static final OID available_space = new OID("1.3.6.1.4.1.2021.9.1.7.1");
     private static final OID used_space = new OID("1.3.6.1.4.1.2021.9.1.8.1");
     private static final OID disk_percent = new OID("1.3.6.1.4.1.2021.9.1.9.1");
+    private static final OID disk_total = new OID("1.3.6.1.4.1.2021.9.1.6.1");
 
     private static SNMPNodeService service;
     private static String result = null;
@@ -102,11 +103,15 @@ public class SysInfoService {
 
     public static Integer getCPUPercent(String address) {
         String idle = new SysInfoService().get(address, cpu_idle_time);
-        if(idle == null || idle == "noSuchObject") {
+        if(idle == null || idle.equals("noSuchObject")) {
             return null;
         } else {
             return 100 - Integer.valueOf(idle);
         }
+    }
+
+    public static String getDiskTotal(String address) {
+        return formatSize(new SysInfoService().get(address, disk_total));
     }
 
     public static HashMap<String, String> walk(String address, OID startOid) {
@@ -120,7 +125,7 @@ public class SysInfoService {
     }
 
     private static String formatSize(String size) {
-        if(size == null) {
+        if(size == null || size.equals("noSuchInstance")) {
             return null;
         }
 

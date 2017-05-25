@@ -13,6 +13,8 @@ import static org.junit.Assert.assertNotNull;
 public class SysInfoServiceTest {
 
     String ip = "192.168.199.212";
+//String ip = "127.0.0.1";
+
     @Test
     public void testGetCPULoad_1() throws IOException {
         assertNotNull(SysInfoService.getCPULoad_1(ip));
@@ -54,12 +56,17 @@ public class SysInfoServiceTest {
     }
 
     @Test
+    public void testGetCPUPercent() throws  IOException {
+        assertNotNull(SysInfoService.getCPUPercent(ip));
+    }
+
+    @Test
     public void testGetCPUNumber() throws  IOException {
         assertNotNull(SysInfoService.getCPUCoreNumber(ip));
     }
 
     @Test
-    public void testGetCPUPercent() throws  IOException {
-        assertNotNull(SysInfoService.getCPUPercent(ip));
+    public void testGetDiskTotal() throws  IOException {
+        assertNotNull(SysInfoService.getDiskTotal(ip));
     }
 }
