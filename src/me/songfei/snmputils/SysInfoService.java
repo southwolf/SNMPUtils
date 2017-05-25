@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.snmp4j.smi.OID;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,18 +20,18 @@ public class SysInfoService {
     private static String result = null;
 
     public static class NetworkInterface implements Comparable<NetworkInterface> {
-        private Integer id;
+        private int id;
         private String name;
         private String mac;
         private String ip;
-        private BigInteger inbound_bit;
-        private BigInteger outbound_bit;
+        private long inbound_bit;
+        private long outbound_bit;
 
-        public Integer getId() {
+        public int getId() {
             return id;
         }
 
-        public void setId(Integer id) {
+        public void setId(int id) {
             this.id = id;
         }
 
@@ -60,19 +59,19 @@ public class SysInfoService {
             this.ip = ip;
         }
 
-        public BigInteger getInboundBit() {
+        public long getInboundBit() {
             return inbound_bit;
         }
 
-        public void setInboundBit(BigInteger inbound_bit) {
+        public void setInboundBit(long inbound_bit) {
             this.inbound_bit = inbound_bit;
         }
 
-        public BigInteger getOutboundBit() {
+        public long getOutboundBit() {
             return outbound_bit;
         }
 
-        public void setOutboundBit(BigInteger outbound_bit) {
+        public void setOutboundBit(long outbound_bit) {
             this.outbound_bit = outbound_bit;
         }
 
@@ -191,8 +190,8 @@ public class SysInfoService {
 
                 net.setId(Integer.valueOf(key.substring(key.lastIndexOf('.')+1)));
                 net.setName(values.get(key));
-                net.setInboundBit(new BigInteger(values.get(Constants.if_in_octets + "." + net.getId())));
-                net.setOutboundBit(new BigInteger(values.get(Constants.if_out_octets + "." + net.getId())));
+                net.setInboundBit(Long.parseLong(values.get(Constants.if_in_octets + "." + net.getId())));
+                net.setOutboundBit(Long.parseLong(values.get(Constants.if_out_octets + "." + net.getId())));
                 networkInterfaces.add(net);
             }
         }
@@ -200,7 +199,7 @@ public class SysInfoService {
         for(String key : ip_values.keySet()) {
             if (key.startsWith(Constants.ip_addr_index.toString())) {
                 for(NetworkInterface net : networkInterfaces) {
-                    if (ip_values.get(key).equals(net.getId().toString())) {
+                    if (ip_values.get(key).equals(String.valueOf(net.getId()))) {
                         net.setIp(key.replace(Constants.ip_addr_index.toString() + ".", ""));
                     }
                 }
