@@ -24,8 +24,8 @@ public class SysInfoService {
         private String name;
         private String mac;
         private String ip;
-        private String inbound_speed;
-        private String outbound_speed;
+        private Integer inbound_speed;
+        private Integer outbound_speed;
 
         public Integer getId() {
             return id;
@@ -59,19 +59,19 @@ public class SysInfoService {
             this.ip = ip;
         }
 
-        public String getInbound_speed() {
+        public Integer getInbound_speed() {
             return inbound_speed;
         }
 
-        public void setInbound_speed(String inbound_speed) {
+        public void setInbound_speed(Integer inbound_speed) {
             this.inbound_speed = inbound_speed;
         }
 
-        public String getOutbound_speed() {
+        public Integer getOutbound_speed() {
             return outbound_speed;
         }
 
-        public void setOutbound_speed(String outbound_speed) {
+        public void setOutbound_speed(Integer outbound_speed) {
             this.outbound_speed = outbound_speed;
         }
 
@@ -190,8 +190,8 @@ public class SysInfoService {
 
                 net.setId(Integer.valueOf(key.substring(key.lastIndexOf('.')+1)));
                 net.setName(values.get(key));
-                net.setInbound_speed(values.get(Constants.if_in_octets + "." + net.getId()));
-                net.setOutbound_speed(values.get(Constants.if_out_octets + "." + net.getId()));
+                net.setInbound_speed(Integer.valueOf(values.get(Constants.if_in_octets + "." + net.getId())));
+                net.setOutbound_speed(Integer.valueOf(values.get(Constants.if_out_octets + "." + net.getId())));
                 networkInterfaces.add(net);
             }
         }
