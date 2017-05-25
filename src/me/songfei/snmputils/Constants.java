@@ -13,7 +13,6 @@ public class Constants {
 
     public static final OID processor_table = new OID("1.3.6.1.2.1.25.3.3");
     public static final OID cpu_load = new OID("1.3.6.1.2.1.25.3.3.1.2");
-    public static final OID cpu_load_linux = new OID("1.3.6.1.2.1.25.3.3.1.2.196608");
     public static final OID one_min_load = new OID("1.3.6.1.4.1.2021.10.1.3.1");
     public static final OID five_min_load = new OID("1.3.6.1.4.1.2021.10.1.3.2");
     public static final OID fifteen_min_load = new OID("1.3.6.1.4.1.2021.10.1.3.3");
