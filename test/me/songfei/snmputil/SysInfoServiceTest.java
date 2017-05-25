@@ -71,7 +71,7 @@ public class SysInfoServiceTest {
     }
 
     @Test
-    public void testGetNetSpeed() throws  IOException {
+    public void testGetNetList() throws  IOException {
         assertNotNull(SysInfoService.getNetList(ip));
     }
 }

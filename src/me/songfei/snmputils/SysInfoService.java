@@ -6,7 +6,9 @@ import org.snmp4j.smi.OID;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by southwolf on 24/05/2017.
@@ -17,19 +19,19 @@ public class SysInfoService {
     private static SNMPNodeService service;
     private static String result = null;
 
-    public static class NetworkInterface {
-        private String id;
+    public static class NetworkInterface implements Comparable<NetworkInterface> {
+        private Integer id;
         private String name;
         private String mac;
         private String ip;
         private String inbound_speed;
         private String outbound_speed;
 
-        public String getId() {
+        public Integer getId() {
             return id;
         }
 
-        public void setId(String id) {
+        public void setId(Integer id) {
             this.id = id;
         }
 
@@ -79,6 +81,12 @@ public class SysInfoService {
                    ", OUT: " + this.outbound_speed +
                    ", IP: " + this.ip;
         }
+
+        @Override
+        public int compareTo(NetworkInterface other) {
+            return this.id - other.getId();
+        }
+
     }
 
     private String get(String address, OID oid) {
@@ -167,10 +175,10 @@ public class SysInfoService {
         return formatSize(new SysInfoService().get(address, Constants.disk_total));
     }
 
-    public static ArrayList<NetworkInterface> getNetList(String address) {
+    public static List<NetworkInterface> getNetList(String address) {
         HashMap<String, String> values = getNetDesc(address);
         HashMap<String, String> ip_values = getIpTree(address);
-        ArrayList<NetworkInterface> networkInterfaces = new ArrayList<NetworkInterface>();
+        List<NetworkInterface> networkInterfaces = new ArrayList<NetworkInterface>();
 
         if (values == null || values.size() == 0) {
             return null;
@@ -180,7 +188,7 @@ public class SysInfoService {
             if (key.startsWith(Constants.if_descr.toString() + ".")) {
                 NetworkInterface net = new NetworkInterface();
 
-                net.setId(key.substring(key.lastIndexOf('.')+1));
+                net.setId(Integer.valueOf(key.substring(key.lastIndexOf('.')+1)));
                 net.setName(values.get(key));
                 net.setInbound_speed(values.get(Constants.if_in_octets + "." + net.getId()));
                 net.setOutbound_speed(values.get(Constants.if_out_octets + "." + net.getId()));
@@ -191,13 +199,13 @@ public class SysInfoService {
         for(String key : ip_values.keySet()) {
             if (key.startsWith(Constants.ip_addr_index.toString())) {
                 for(NetworkInterface net : networkInterfaces) {
-                    if (ip_values.get(key).equals(net.getId())) {
+                    if (ip_values.get(key).equals(net.getId().toString())) {
                         net.setIp(key.replace(Constants.ip_addr_index.toString() + ".", ""));
                     }
                 }
             }
         }
-
+        Collections.sort(networkInterfaces);
         return networkInterfaces;
     }
 
