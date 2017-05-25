@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.snmp4j.smi.OID;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,8 +25,8 @@ public class SysInfoService {
         private String name;
         private String mac;
         private String ip;
-        private Integer inbound_speed;
-        private Integer outbound_speed;
+        private BigInteger inbound_bit;
+        private BigInteger outbound_bit;
 
         public Integer getId() {
             return id;
@@ -59,26 +60,26 @@ public class SysInfoService {
             this.ip = ip;
         }
 
-        public Integer getInbound_speed() {
-            return inbound_speed;
+        public BigInteger getInboundBit() {
+            return inbound_bit;
         }
 
-        public void setInbound_speed(Integer inbound_speed) {
-            this.inbound_speed = inbound_speed;
+        public void setInboundBit(BigInteger inbound_bit) {
+            this.inbound_bit = inbound_bit;
         }
 
-        public Integer getOutbound_speed() {
-            return outbound_speed;
+        public BigInteger getOutboundBit() {
+            return outbound_bit;
         }
 
-        public void setOutbound_speed(Integer outbound_speed) {
-            this.outbound_speed = outbound_speed;
+        public void setOutboundBit(BigInteger outbound_bit) {
+            this.outbound_bit = outbound_bit;
         }
 
         public String toString() {
             return this.id + ": " + this.name +
-                   ", IN: " + this.inbound_speed +
-                   ", OUT: " + this.outbound_speed +
+                   ", IN: " + this.inbound_bit +
+                   ", OUT: " + this.outbound_bit +
                    ", IP: " + this.ip;
         }
 
@@ -190,8 +191,8 @@ public class SysInfoService {
 
                 net.setId(Integer.valueOf(key.substring(key.lastIndexOf('.')+1)));
                 net.setName(values.get(key));
-                net.setInbound_speed(Integer.valueOf(values.get(Constants.if_in_octets + "." + net.getId())));
-                net.setOutbound_speed(Integer.valueOf(values.get(Constants.if_out_octets + "." + net.getId())));
+                net.setInboundBit(new BigInteger(values.get(Constants.if_in_octets + "." + net.getId())));
+                net.setOutboundBit(new BigInteger(values.get(Constants.if_out_octets + "." + net.getId())));
                 networkInterfaces.add(net);
             }
         }
