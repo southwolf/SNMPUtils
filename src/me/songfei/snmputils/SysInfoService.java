@@ -13,22 +13,24 @@ import java.util.HashMap;
 public class SysInfoService {
     private static Logger logger = LoggerFactory.getLogger(SysInfoService.class);
 
-    private static final OID sys_name = new OID(".1.3.6.1.2.1.1");
+    private static final OID sys_name = new OID("1.3.6.1.2.1.1");
     private static final OID sys_desc = new OID("1.3.6.1.2.1.25.3.2.1.3");
+    private static final OID sys_tree = new OID("1.3.6.1.2.1.25.3.2.1");
+    private static final OID hr_type_processor = new OID("1.3.6.1.2.1.25.3.1.3");
 
-    private static final OID processor_table = new OID(".1.3.6.1.2.1.25.3.3");
-    private static final OID cpu_load = new OID(".1.3.6.1.2.1.25.3.3.1.2");
-    private static final OID cpu_load_linux = new OID(".1.3.6.1.2.1.25.3.3.1.2.196608");
-    private static final OID one_min_load = new OID(".1.3.6.1.4.1.2021.10.1.3.1");
-    private static final OID five_min_load = new OID(".1.3.6.1.4.1.2021.10.1.3.2");
-    private static final OID fifteen_min_load = new OID(".1.3.6.1.4.1.2021.10.1.3.3");
-    private static final OID cpu_idle_time = new OID(".1.3.6.1.4.1.2021.11.11.0");
+    private static final OID processor_table = new OID("1.3.6.1.2.1.25.3.3");
+    private static final OID cpu_load = new OID("1.3.6.1.2.1.25.3.3.1.2");
+    private static final OID cpu_load_linux = new OID("1.3.6.1.2.1.25.3.3.1.2.196608");
+    private static final OID one_min_load = new OID("1.3.6.1.4.1.2021.10.1.3.1");
+    private static final OID five_min_load = new OID("1.3.6.1.4.1.2021.10.1.3.2");
+    private static final OID fifteen_min_load = new OID("1.3.6.1.4.1.2021.10.1.3.3");
+    private static final OID cpu_idle_time = new OID("1.3.6.1.4.1.2021.11.11.0");
 
-    private static final OID total_ram_free = new OID(".1.3.6.1.4.1.2021.4.11.0");
+    private static final OID total_ram_free = new OID("1.3.6.1.4.1.2021.4.11.0");
 
-    private static final OID available_space = new OID(".1.3.6.1.4.1.2021.9.1.7.1");
-    private static final OID used_space = new OID(".1.3.6.1.4.1.2021.9.1.8.1");
-    private static final OID disk_percent = new OID(".1.3.6.1.4.1.2021.9.1.9.1");
+    private static final OID available_space = new OID("1.3.6.1.4.1.2021.9.1.7.1");
+    private static final OID used_space = new OID("1.3.6.1.4.1.2021.9.1.8.1");
+    private static final OID disk_percent = new OID("1.3.6.1.4.1.2021.9.1.9.1");
 
     private static SNMPNodeService service;
     private static String result = null;
@@ -76,17 +78,23 @@ public class SysInfoService {
 
 
     public static HashMap<String, String> getSysDesc(String address) {
-        return SysInfoService.walk(address, sys_desc);
+        return SysInfoService.walk(address, sys_tree);
     }
 
     public static String getCPUName(String address) {
         HashMap<String, String> values = getSysDesc(address);
+
         if(values == null || values.size() == 0) {
             return null;
-        } else {
-            Object first_key = values.keySet().toArray()[0];
-            return values.get(first_key);
         }
+        for(String key : values.keySet()) {
+            if (values.get(key).equals(hr_type_processor.toString())) {
+                String cpu_id = key.substring(key.lastIndexOf('.')+1);
+                System.out.println(values.get(sys_desc.toString() + "." + cpu_id));
+                return values.get(sys_desc.toString() + "." + cpu_id);
+            }
+        }
+        return null;
     }
 
     public static Integer getCPUCoreNumber(String address) {
