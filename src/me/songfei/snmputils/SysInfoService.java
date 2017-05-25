@@ -90,7 +90,6 @@ public class SysInfoService {
         for(String key : values.keySet()) {
             if (values.get(key).equals(hr_type_processor.toString())) {
                 String cpu_id = key.substring(key.lastIndexOf('.')+1);
-                System.out.println(values.get(sys_desc.toString() + "." + cpu_id));
                 return values.get(sys_desc.toString() + "." + cpu_id);
             }
         }
