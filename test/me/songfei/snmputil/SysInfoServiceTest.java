@@ -6,7 +6,6 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * Created by southwolf on 25/05/2017.
@@ -50,12 +49,12 @@ public class SysInfoServiceTest {
 
     @Test
     public void testGetCPUName() throws IOException {
-        assertNull(SysInfoService.getCPUName("127.0.0.1"));
+        assertNotNull(SysInfoService.getCPUName("127.0.0.1"));
     }
 
     @Test
     public void testGetCPUNumber() throws  IOException {
-        assertNull(SysInfoService.getCPUCoreNumber("127.0.0.1"));
+        assertNotNull(SysInfoService.getCPUCoreNumber("127.0.0.1"));
     }
 
     @Test
