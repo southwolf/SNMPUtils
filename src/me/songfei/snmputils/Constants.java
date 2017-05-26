@@ -19,6 +19,7 @@ public class Constants {
     static final OID cpu_idle_time = new OID("1.3.6.1.4.1.2021.11.11.0");
 
     static final OID total_ram_free = new OID("1.3.6.1.4.1.2021.4.11.0");
+    static final OID ram_size = new OID("1.3.6.1.4.1.2021.4.5.0");
 
     static final OID available_space = new OID("1.3.6.1.4.1.2021.9.1.7.1");
     static final OID used_space = new OID("1.3.6.1.4.1.2021.9.1.8.1");
@@ -34,10 +35,9 @@ public class Constants {
 
     static final OID storage_tree = new OID("1.3.6.1.2.1.25.2");
     static final OID hr_storage_fixed_disk = new OID("1.3.6.1.2.1.25.2.1.4");
+    static final OID hr_storage_ram = new OID("1.3.6.1.2.1.25.2.1.2");
     static final OID hr_storage_index = new OID("1.3.6.1.2.1.25.2.3.1.2");
     static final OID hr_storage_size = new OID("1.3.6.1.2.1.25.2.3.1.5");
     static final OID hr_storage_used = new OID("1.3.6.1.2.1.25.2.3.1.6");
     static final OID hr_storage_allocation_unit = new OID("1.3.6.1.2.1.25.2.3.1.4");
-
-
 }

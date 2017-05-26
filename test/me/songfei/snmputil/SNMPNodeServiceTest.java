@@ -24,7 +24,7 @@ public class SNMPNodeServiceTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        service = new SNMPNodeService("127.0.0.1");
+        service = new SNMPNodeService("127.0.0.1", "public");
     }
 
     @AfterClass

@@ -22,13 +22,15 @@ import java.util.List;
  */
 public class SNMPNodeService {
     private String address;
+    private String community;
 
     private Snmp snmp;
     private static Logger logger = LoggerFactory.getLogger(SNMPNodeService.class);
 
-    public SNMPNodeService(String address) {
+    public SNMPNodeService(String address, String community) {
         super();
         this.address = address;
+        this.community = community;
         try {
             start();
         } catch (IOException e) {
@@ -87,7 +89,7 @@ public class SNMPNodeService {
     private Target getTarget() {
         Address targetAddress = GenericAddress.parse("udp:" + address + "/161");
         CommunityTarget target = new CommunityTarget();
-        target.setCommunity(new OctetString("public"));
+        target.setCommunity(new OctetString(community));
         target.setAddress(targetAddress);
         target.setRetries(2);
         target.setTimeout(1500);

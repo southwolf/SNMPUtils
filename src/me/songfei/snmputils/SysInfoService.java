@@ -91,9 +91,9 @@ public class SysInfoService {
 
     }
 
-    private String get(String address, OID oid) {
+    private String get(String address, String community, OID oid) {
         try {
-            service = new SNMPNodeService(address);
+            service = new SNMPNodeService(address, community);
             result = service.getAsString(oid);
             service.stop();
             return result;
@@ -103,54 +103,50 @@ public class SysInfoService {
         }
     }
 
-    public static String getCPULoad_1(String address) {
-        return new SysInfoService().get(address, Constants.one_min_load);
+    public static String getCPULoad_1(String address, String community) {
+        return new SysInfoService().get(address, community, Constants.one_min_load);
     }
 
-    public static String getCPULoad_5(String address) {
-        return new SysInfoService().get(address, Constants.five_min_load);
+    public static String getCPULoad_5(String address, String community) {
+        return new SysInfoService().get(address, community, Constants.five_min_load);
     }
 
-    public static String getCPULoad_15(String address) {
-        return new SysInfoService().get(address, Constants.fifteen_min_load);
+    public static String getCPULoad_15(String address, String community) {
+        return new SysInfoService().get(address, community, Constants.fifteen_min_load);
 
     }
 
-    public static String getMemFree(String address) {
-        return new SysInfoService().get(address, Constants.total_ram_free);
-    }
-
-    public static String getDiskUsedPercent(String address) {
-        String result = new SysInfoService().get(address, Constants.disk_percent);
+    public static String getDiskUsedPercent(String address, String community) {
+        String result = new SysInfoService().get(address, community, Constants.disk_percent);
         if(result == null || result == "noSuchObject") {
-            result = String.valueOf(Long.valueOf(getDiskUsed_raw(address)) * 100 / Long.valueOf(getDiskTotal_raw(address)));
+            result = String.valueOf(Long.valueOf(getDiskUsed_raw(address, community)) * 100 / Long.valueOf(getDiskTotal_raw(address, community)));
         }
         return result;
     }
 
 
-    public static Map<String, String> getSysDesc(String address) {
-        return walk(address, Constants.sys_tree);
+    public static Map<String, String> getSysDesc(String address, String community) {
+        return walk(address, community, Constants.sys_tree);
     }
 
-    public static Map<String, String> getNetDesc(String address) {
-        return walk(address, Constants.net_tree);
+    public static Map<String, String> getNetDesc(String address, String community) {
+        return walk(address, community, Constants.net_tree);
     }
 
-    public static Map<String, String> getIpTree(String address) {
-        return walk(address, Constants.ip_addr_entry);
+    public static Map<String, String> getIpTree(String address, String community) {
+        return walk(address, community, Constants.ip_addr_entry);
     }
 
-    public static Map<String, String> getCPUTree(String address) {
-        return walk(address, Constants.cpu_load);
+    public static Map<String, String> getCPUTree(String address, String community) {
+        return walk(address, community, Constants.cpu_load);
     }
 
-    public static Integer getCPUCoreNumber(String address) {
-        return getCPUTree(address).size();
+    public static Integer getCPUCoreNumber(String address, String community) {
+        return getCPUTree(address, community).size();
     }
 
-    public static String getCPUName(String address) {
-        Map<String, String> values = getSysDesc(address);
+    public static String getCPUName(String address, String community) {
+        Map<String, String> values = getSysDesc(address, community);
 
         if (values == null || values.size() == 0) {
             return null;
@@ -164,8 +160,8 @@ public class SysInfoService {
         return null;
     }
 
-    public static Map<String, String> getCPULoads(String address) {
-        Map<String, String> values = getCPUTree(address);
+    public static Map<String, String> getCPULoads(String address, String community) {
+        Map<String, String> values = getCPUTree(address, community);
         Map<String, String> temp = new TreeMap<String, String>(values);
         Map<String, String> result = new TreeMap<String, String>();
         for(int i = 0; i < temp.size(); i++) {
@@ -176,17 +172,17 @@ public class SysInfoService {
         return result;
     }
 
-    public static double getCPUPercent(String address) {
-        String idle = new SysInfoService().get(address, Constants.cpu_idle_time);
+    public static double getCPUPercent(String address, String community) {
+        String idle = new SysInfoService().get(address, community, Constants.cpu_idle_time);
         if (idle == null || idle.equals("noSuchObject")) {
-            return getCPUPercent_win(address);
+            return getCPUPercent_win(address, community);
         } else {
             return (double)(100 - Integer.valueOf(idle));
         }
     }
 
-    public static double getCPUPercent_win(String address) {
-        Map<String, String> loads = getCPULoads(address);
+    public static double getCPUPercent_win(String address, String community) {
+        Map<String, String> loads = getCPULoads(address, community);
         double percent = 0.0;
 
         if(loads == null || loads.size() == 0) {
@@ -201,20 +197,20 @@ public class SysInfoService {
     }
 
 
-    public static String getDiskTotal_raw(String address) {
-        String result = new SysInfoService().get(address, Constants.disk_total);
+    public static String getDiskTotal_raw(String address, String community) {
+        String result = new SysInfoService().get(address, community, Constants.disk_total);
         if(result == null || result.equals("noSuchObject")) {
-            result = getDiskTotal_win(address);
+            result = getDiskTotal_win(address, community);
         }
         return result;
     }
 
-    public static String getDiskTotal(String address) {
-        return formatSize(getDiskTotal_raw(address));
+    public static String getDiskTotal(String address, String community) {
+        return formatSize(getDiskTotal_raw(address, community));
     }
 
-    public static String getDiskTotal_win(String address) {
-        Map<String, String> values = SysInfoService.walk(address, Constants.storage_tree);
+    public static String getDiskTotal_win(String address, String community) {
+        Map<String, String> values = SysInfoService.walk(address, community, Constants.storage_tree);
         Map<String, String> result = new HashMap<String, String>();
         if(values == null || values.size() == 0) {
             return null;
@@ -238,20 +234,20 @@ public class SysInfoService {
     }
 
 
-    public static String getDiskUsed_raw(String address) {
-        String result = new SysInfoService().get(address, Constants.used_space);
+    public static String getDiskUsed_raw(String address, String community) {
+        String result = new SysInfoService().get(address, community, Constants.used_space);
         if(result == null || result.equals("noSuchObject")) {
-            result = getDiskUsed_win(address);
+            result = getDiskUsed_win(address, community);
         }
         return result;
     }
 
-    public static String getDiskUsed(String address) {
-        return formatSize(getDiskUsed_raw(address));
+    public static String getDiskUsed(String address, String community) {
+        return formatSize(getDiskUsed_raw(address, community));
     }
 
-    public static String getDiskUsed_win(String address) {
-        Map<String, String> values = SysInfoService.walk(address, Constants.storage_tree);
+    public static String getDiskUsed_win(String address, String community) {
+        Map<String, String> values = SysInfoService.walk(address, community, Constants.storage_tree);
         Map<String, String> result = new HashMap<String, String>();
         if(values == null || values.size() == 0) {
             return null;
@@ -274,23 +270,100 @@ public class SysInfoService {
         return String.valueOf(sum / 1024);
     }
 
-    public static String getDiskFree_raw(String address) {
-        String result = new SysInfoService().get(address, Constants.available_space);
+    public static String getDiskFree_raw(String address, String community) {
+        String result = new SysInfoService().get(address, community, Constants.available_space);
         long result_l = 0l;
         if(result == null || result.equals("noSuchObject")) {
-            result_l = Long.valueOf(getDiskTotal_raw(address)) - Long.valueOf(getDiskUsed_raw(address));
+            result_l = Long.valueOf(getDiskTotal_raw(address, community)) - Long.valueOf(getDiskUsed_raw(address, community));
         }
         result = String.valueOf(result_l);
         return result;
     }
 
-    public static String getDiskFree(String address) {
-        return formatSize(getDiskFree_raw(address));
+    public static String getDiskFree(String address, String community) {
+        return formatSize(getDiskFree_raw(address, community));
     }
 
-    public static List<NetworkInterface> getNetList(String address) {
-        Map<String, String> values = getNetDesc(address);
-        Map<String, String> ip_values = getIpTree(address);
+    public static String getMemTotal(String address, String community) {
+        return formatSize(getMemTotal_raw(address, community));
+    }
+
+
+    public static String getMemTotal_raw(String address, String community) {
+        String result = new SysInfoService().get(address, community, Constants.ram_size);
+        if(result == null || result.equals("noSuchObject")) {
+            result = getMemTotal_win(address, community);
+        }
+        return result;
+    }
+
+    public static String getMemTotal_win(String address, String community) {
+        Map<String, String> values = SysInfoService.walk(address, community, Constants.storage_tree);
+        if(values == null || values.size() == 0) {
+            return null;
+        }
+        for(String key : values.keySet()) {
+            if(key.startsWith(Constants.hr_storage_index.toString() + ".")) {
+                if(values.get(key).equals(Constants.hr_storage_ram.toString())) {
+                    String mem_id = key.substring(key.lastIndexOf('.')+1);
+                    long result = Long.valueOf(values.get(Constants.hr_storage_size.toString() + "." + mem_id)) *
+                            Long.valueOf(values.get(Constants.hr_storage_allocation_unit.toString() + "." + mem_id)) / 1024;
+                    return String.valueOf(result);
+                }
+            }
+        }
+        return null;
+    }
+
+    public static String getMemFree(String address, String community) {
+        return formatSize(getMemFree_raw(address, community));
+    }
+
+
+    public static String getMemFree_raw(String address, String community) {
+        String result = new SysInfoService().get(address, community, Constants.total_ram_free);
+        long result_l = 0l;
+        if(result == null || result.equals("noSuchObject")) {
+            result_l = Long.valueOf(getMemTotal_raw(address, community)) - Long.valueOf(getMemUsed_raw(address, community));
+        }
+        result = String.valueOf(result_l);
+        return result;
+    }
+
+    public static String getMemUsed(String address, String community) {
+        return formatSize(getMemUsed_raw(address, community));
+    }
+
+
+    public static String getMemUsed_raw(String address, String community) {
+        String result = new SysInfoService().get(address, community, Constants.ram_size);
+        if(result == null || result.equals("noSuchObject")) {
+            result = getMemTotal_win(address, community);
+        }
+        return result;
+    }
+
+    public static String getMemUsed_win(String address, String community) {
+        Map<String, String> values = SysInfoService.walk(address, community, Constants.storage_tree);
+        if(values == null || values.size() == 0) {
+            return null;
+        }
+        for(String key : values.keySet()) {
+            if(key.startsWith(Constants.hr_storage_index.toString() + ".")) {
+                if(values.get(key).equals(Constants.hr_storage_ram.toString())) {
+                    String mem_id = key.substring(key.lastIndexOf('.')+1);
+                    long result = Long.valueOf(values.get(Constants.hr_storage_used.toString() + "." + mem_id)) *
+                            Long.valueOf(values.get(Constants.hr_storage_allocation_unit.toString() + "." + mem_id)) / 1024;
+                    return String.valueOf(result);
+                }
+            }
+        }
+        return null;
+    }
+
+    public static List<NetworkInterface> getNetList(String address, String community) {
+        Map<String, String> values = getNetDesc(address, community);
+        Map<String, String> ip_values = getIpTree(address, community);
         List<NetworkInterface> networkInterfaces = new ArrayList<NetworkInterface>();
 
         if (values == null || values.size() == 0) {
@@ -322,9 +395,9 @@ public class SysInfoService {
         return networkInterfaces;
     }
 
-    public static Map<String, String> walk(String address, OID startOid) {
+    public static Map<String, String> walk(String address, String community, OID startOid) {
         try {
-            return new SNMPNodeService(address).walk(startOid);
+            return new SNMPNodeService(address, community).walk(startOid);
         } catch (IOException e) {
             logger.debug("SNMP walk error: ", e);
             return null;
