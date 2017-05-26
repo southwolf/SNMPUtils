@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 public class SysInfoServiceTest {
 
 //    String ip = "192.168.199.212";
-    //String ip = "127.0.0.1";
+//    String ip = "127.0.0.1";
     String ip = "192.168.199.200";
     String community = "public";
 
@@ -32,10 +32,20 @@ public class SysInfoServiceTest {
         assertNotNull(SysInfoService.getCPULoad_15(ip, community));
     }
 
-//    @Test
-//    public void testGetMemFree() throws IOException {
-//        assertNotNull(SysInfoService.getMemFree(ip, community));
-//    }
+    @Test
+    public void testGetMemFree() throws IOException {
+        assertNotNull(SysInfoService.getMemFree(ip, community));
+    }
+
+    @Test
+    public void testGetMemUsed() throws IOException {
+        assertNotNull(SysInfoService.getMemUsed(ip, community));
+    }
+
+    @Test
+    public void testGetMemUsedPercent() throws IOException {
+        assertNotNull(SysInfoService.getMemUsedPercent(ip, community));
+    }
 
     @Test
     public void testGetMemTotal() throws IOException {
