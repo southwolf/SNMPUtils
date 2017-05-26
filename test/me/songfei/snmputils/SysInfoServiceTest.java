@@ -1,6 +1,5 @@
-package me.songfei.snmputil;
+package me.songfei.snmputils;
 
-import me.songfei.snmputils.SysInfoService;
 import org.junit.Test;
 
 import java.io.IOException;

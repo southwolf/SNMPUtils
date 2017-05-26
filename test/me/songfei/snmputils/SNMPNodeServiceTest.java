@@ -1,6 +1,5 @@
-package me.songfei.snmputil;
+package me.songfei.snmputils;
 
-import me.songfei.snmputils.SNMPNodeService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -9,7 +8,6 @@ import org.snmp4j.smi.OID;
 import java.io.IOException;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * Created by southwolf on 24/05/2017.
@@ -24,7 +22,7 @@ public class SNMPNodeServiceTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        service = new SNMPNodeService("127.0.0.1", "public");
+        service = new SNMPNodeService("192.168.199.200", "public");
     }
 
     @AfterClass
@@ -44,6 +42,6 @@ public class SNMPNodeServiceTest {
 
     @Test
     public void testDisk() throws IOException {
-        assertNull(service.getAsString(disk));
+        assertNotNull(service.getAsString(disk));
     }
 }
