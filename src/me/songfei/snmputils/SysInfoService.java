@@ -44,7 +44,12 @@ public class SysInfoService {
     public static String getDiskUsedPercent(String address, String community) {
         String result = new SysInfoService().get(address, community, Constants.disk_percent);
         if(result == null || result == "noSuchObject") {
-            result = String.valueOf(Long.valueOf(getDiskUsed_raw(address, community)) * 100 / Long.valueOf(getDiskTotal_raw(address, community)));
+            String used = getDiskUsed_raw(address, community);
+            String total = getDiskTotal_raw(address, community);
+            if(used == null || total == null) {
+                return null;
+            }
+            result = String.valueOf(Long.valueOf(used) * 100 / Long.valueOf(total));
         }
         return result;
     }
@@ -199,7 +204,12 @@ public class SysInfoService {
         String result = new SysInfoService().get(address, community, Constants.available_space);
         long result_l = 0l;
         if(result == null || result.equals("noSuchObject")) {
-            result_l = Long.valueOf(getDiskTotal_raw(address, community)) - Long.valueOf(getDiskUsed_raw(address, community));
+            String total = getDiskTotal_raw(address, community);
+            String used = getDiskUsed_raw(address, community);
+            if(total == null || used == null) {
+                return null;
+            }
+            result_l = Long.valueOf(total) - Long.valueOf(used);
         }
         result = String.valueOf(result_l);
         return result;
@@ -231,8 +241,13 @@ public class SysInfoService {
             if(key.startsWith(Constants.hr_storage_index.toString() + ".")) {
                 if(values.get(key).equals(Constants.hr_storage_ram.toString())) {
                     String mem_id = key.substring(key.lastIndexOf('.')+1);
-                    long result = Long.valueOf(values.get(Constants.hr_storage_size.toString() + "." + mem_id)) *
-                            Long.valueOf(values.get(Constants.hr_storage_allocation_unit.toString() + "." + mem_id)) / 1024;
+                    String size = values.get(Constants.hr_storage_size.toString() + "." + mem_id);
+                    String unit = values.get(Constants.hr_storage_allocation_unit.toString() + "." + mem_id);
+                    if(size == null || unit == null) {
+                        return null;
+                    }
+                    long result = Long.valueOf(size) *
+                            Long.valueOf(unit) / 1024;
                     return String.valueOf(result);
                 }
             }
@@ -249,7 +264,12 @@ public class SysInfoService {
         String result = new SysInfoService().get(address, community, Constants.total_ram_free);
         long result_l = 0l;
         if(result == null || result.equals("noSuchObject")) {
-            result_l = Long.valueOf(getMemTotal_raw(address, community)) - Long.valueOf(getMemUsed_raw(address, community));
+            String total = getMemTotal_raw(address, community);
+            String used = getMemUsed_raw(address, community);
+            if (total == null || used == null) {
+                return null;
+            }
+            result_l = Long.valueOf(total) - Long.valueOf(used);
         }
         result = String.valueOf(result_l);
         return result;
@@ -276,8 +296,13 @@ public class SysInfoService {
             if(key.startsWith(Constants.hr_storage_index.toString() + ".")) {
                 if(values.get(key).equals(Constants.hr_storage_ram.toString())) {
                     String mem_id = key.substring(key.lastIndexOf('.')+1);
-                    long result = Long.valueOf(values.get(Constants.hr_storage_used.toString() + "." + mem_id)) *
-                            Long.valueOf(values.get(Constants.hr_storage_allocation_unit.toString() + "." + mem_id)) / 1024;
+                    String used = values.get(Constants.hr_storage_used.toString() + "." + mem_id);
+                    String unit = values.get(Constants.hr_storage_allocation_unit.toString() + "." + mem_id);
+                    if(used == null || unit == null) {
+                        return null;
+                    }
+                    long result = Long.valueOf(used) *
+                            Long.valueOf(unit) / 1024;
                     return String.valueOf(result);
                 }
             }
@@ -286,7 +311,12 @@ public class SysInfoService {
     }
 
     public static String getMemUsedPercent(String address, String community) {
-        return String.valueOf(Long.valueOf(getMemUsed_raw(address, community)) * 100 / Long.valueOf(getMemTotal_raw(address, community)));
+        String used = getMemUsed_raw(address, community);
+        String total = getMemTotal_raw(address, community);
+        if(used == null || total == null) {
+            return null;
+        }
+        return String.valueOf(Long.valueOf(used) * 100 / Long.valueOf(total));
     }
 
 
@@ -302,7 +332,6 @@ public class SysInfoService {
         for(String key : values.keySet()) {
             if (key.startsWith(Constants.if_descr.toString() + ".")) {
                 NetworkInterface net = new NetworkInterface();
-
                 net.setId(Integer.valueOf(key.substring(key.lastIndexOf('.')+1)));
                 net.setName(parseName(values.get(key)));
                 net.setInboundBit(Long.parseLong(values.get(Constants.if_in_octets + "." + net.getId())));

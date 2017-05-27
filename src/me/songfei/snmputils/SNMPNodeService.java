@@ -51,10 +51,14 @@ public class SNMPNodeService {
     public String getAsString(OID oid) throws IOException {
         try {
             ResponseEvent event = get(new OID[]{oid});
+            if(event == null || event.getResponse() == null || event.getResponse().size() == 0) {
+                throw new IOException("SNMP Time out.");
+            }
+
             return event.getResponse().get(0).getVariable().toString();
         }catch (NullPointerException e) {
             logger.debug("GET SNMP info error: ", e);
-            return null;
+            throw new IOException("SNMP Time out.");
         }
     }
 
