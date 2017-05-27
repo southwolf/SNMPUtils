@@ -22,11 +22,15 @@ public class Main {
         System.out.println("磁盘容量: " + SysInfoService.getDiskTotal(host, c));
         System.out.println("磁盘利用率: " + SysInfoService.getDiskUsedPercent(host, c) + " %");
 
-//        System.out.println("网卡列表:");
+        System.out.println("网卡列表:");
         List<NetworkInterface> netList = SysInfoService.getNetList(host, c);
 
+        if(netList == null) {
+            return;
+        }
+
         for(NetworkInterface net : netList) {
-//            System.out.println("ID: " + net.getId() + ", NAME: " + net.getName() + " IP: " + net.getIp());
+            System.out.println("ID: " + net.getId() + ", NAME: " + net.getName() + " IP: " + net.getIp());
             if(net.getIp().equals(host)) {
                 net_id = net.getId();
             }

@@ -27,15 +27,11 @@ public class SNMPNodeService {
     private Snmp snmp;
     private static Logger logger = LoggerFactory.getLogger(SNMPNodeService.class);
 
-    public SNMPNodeService(String address, String community) {
+    public SNMPNodeService(String address, String community) throws IOException {
         super();
         this.address = address;
         this.community = community;
-        try {
-            start();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        start();
     }
 
     public void stop() throws IOException {
@@ -48,17 +44,20 @@ public class SNMPNodeService {
         transport.listen();
     }
 
-    public String getAsString(OID oid) throws IOException {
+    public String getAsString(OID oid) {
         try {
             ResponseEvent event = get(new OID[]{oid});
             if(event == null || event.getResponse() == null || event.getResponse().size() == 0) {
-                throw new IOException("SNMP Time out.");
+                return null;
             }
 
             return event.getResponse().get(0).getVariable().toString();
         }catch (NullPointerException e) {
             logger.debug("GET SNMP info error: ", e);
-            throw new IOException("SNMP Time out.");
+            return null;
+        } catch (Exception e) {
+            logger.debug("SNMP time out: ", e);
+            return null;
         }
     }
 
@@ -67,17 +66,20 @@ public class SNMPNodeService {
             snmp.send(getPDU(new OID[]{oids}), getTarget(),null, listener);
         } catch (IOException e) {
             logger.debug("GET SNMP info error: ", e);
-            throw new RuntimeException(e);
         }
     }
 
-    public ResponseEvent get(OID oids[]) throws IOException {
-        ResponseEvent event = snmp.send(getPDU(oids), getTarget(), null);
-        if(event != null) {
-            return event;
+    public ResponseEvent get(OID oids[]) {
+        try {
+            ResponseEvent event = snmp.send(getPDU(oids), getTarget(), null);
+            if (event != null) {
+                return event;
+            }
+        } catch (IOException e) {
+            logger.debug("GET timed out");
+            return null;
         }
-        logger.debug("GET timed out");
-        throw new RuntimeException("GET timed out");
+        return null;
     }
 
     private PDU getPDU(OID oids[]) {

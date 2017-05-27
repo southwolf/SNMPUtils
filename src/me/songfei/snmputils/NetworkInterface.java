@@ -4,12 +4,12 @@ package me.songfei.snmputils;
  * Created by southwolf on 26/05/2017.
  */
 public class NetworkInterface implements Comparable<NetworkInterface> {
-    private int id;
-    private String name;
-    private String mac;
-    private String ip;
-    private long inbound_bit;
-    private long outbound_bit;
+    private int id = 0;
+    private String name = null;
+    private String mac = null;
+    private String ip = null;
+    private long inbound_bit = 0l;
+    private long outbound_bit = 0l;
 
     public int getId() {
         return id;
@@ -35,14 +35,7 @@ public class NetworkInterface implements Comparable<NetworkInterface> {
         this.mac = mac;
     }
 
-    public String getIp()
-    {
-        if(ip == null) {
-            return "null";
-        } else {
-            return ip;
-        }
-    }
+    public String getIp() { return ip; }
 
     public void setIp(String ip) {
         this.ip = ip;
@@ -75,5 +68,4 @@ public class NetworkInterface implements Comparable<NetworkInterface> {
     public int compareTo(NetworkInterface other) {
         return this.id - other.getId();
     }
-
 }
