@@ -35,7 +35,14 @@ public class NetworkInterface implements Comparable<NetworkInterface> {
         this.mac = mac;
     }
 
-    public String getIp() { return ip; }
+    public String getIp()
+    {
+        if(ip == null) {
+            return "null";
+        } else {
+            return ip;
+        }
+    }
 
     public void setIp(String ip) {
         this.ip = ip;
